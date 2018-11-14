@@ -101,6 +101,8 @@ for p_idx, p in enumerate(PLAYER_ACCESS):
 
 ########################## INTERESTING PART #################
 
+
+##
 def stpf(s, a):
 	tp = np.zeros(N_STATES)
 	# if end -> end
@@ -133,7 +135,7 @@ def reward(s, a):
 
 def print_board(p,m):
 
-	board_strings=[["A","   ","_"," │ ","_","   ","_","   ","_","   ","_"],\
+	board_strings=[["𓐍","   ","_"," │ ","_","   ","_","   ","_","   ","_"],\
 				   [" ","   "," ","   "," ","   "," ","   "," ","   "," "],\
 				   ["_","   ","_"," │ ","_","   ","_"," │ ","_","   ","_"],\
 				   [" ","   "," ","   "," ","   "," ","   "," ","   "," "],\
@@ -141,14 +143,17 @@ def print_board(p,m):
 				   [" ","   "," ","   "," ","   "," ","   "," ","   "," "],\
 				   ["_","   ","_","   ","_","   ","_","   ","_","   ","_"],\
 				   [" ","   "," ","   "," ","   "," ","   "," ","   "," "],\
-				   ["_","   ","_"," │ ","_","   ","_"," │ ","B","   ","_"]]
+				   ["_","   ","_"," │ ","_","   ","_"," │ ","𓊓","   ","_"]]
 	pr,pc=idx2rc(p);
 	mr,mc=idx2rc(m);
 	out=board_strings.copy();
-	out[pr*2][pc*2]="Ρ";
-	out[mr*2][mc*2]="Μ";
+	out[pr*2][pc*2]="𓁆";
+	out[mr*2][mc*2]="𓃾";
 	if m==p:
 		out[mr*2][mc*2]="✞";
+	elif p==28:
+		out[pr*2][pc*2]="𓀠";
+
 
 	print("___________________________________________")
 	for l in out:
@@ -177,6 +182,20 @@ def try_policy(policy, T):
 			np.random.uniform(0, len(MINOTAUR_ACCESS[m])))]
 	return False;
 
+def display_policy(policy,t,m):
+
+	policy_wrt_m=policy[m*30:m*30+30];
+	action_icons=["⧖","⥣","⥤","⥥","⥢"];
+	minotaur_icon="𓃾";
+			
+	policy_str=[action_icons[a] for a in policy_wrt_m]
+	policy_str[m]=minotaur_icon;
+	for r in range(0,5):
+		print('  '.join(policy_str[r*6:r*6+6]))
+	return
+
+
+
 
 #precompute transition probability matrix.
 stps = np.zeros((N_STATES, N_STATES, N_ACTIONS))
@@ -193,6 +212,10 @@ for state in range(0, N_STATES):
 
 #Bellman induction
 u_star = np.amax(rewards, 1)
+
+print(rewards)
+
+print(np.sum(u_star))
 u_a = np.argmax(rewards, 1)
 
 
@@ -216,7 +239,7 @@ for i in range(0, 30):
 
 try_policy(policy, T)
 
-
+display_policy(policy,10,1)
 
 '''
 N=10000
