@@ -229,10 +229,9 @@ def get_minotaur_action():
 
 def display_policy(policy, t, m):
 
-	policy_wrt_m = policy[m * 30:m * 30 + 30]
+	policy_wrt_m = policy[m * 30:m * 30 + 30,t]
 	action_icons = ["⧖", "⥣", "⥤", "⥥", "⥢"]
 	minotaur_icon = "𓃾"
-
 	policy_str = [action_icons[a] for a in policy_wrt_m]
 	policy_str[m] = minotaur_icon
 	for r in range(0, 5):
@@ -276,10 +275,14 @@ def bellman_induction(stps,rewards,T):
 policy=bellman_induction(stps,rewards,T)
 
 #try_policy(policy, T, True)
-play(policy,T)
+#play(policy,T)
 
 for x in range(100000):
 	print("Progress {:2.1%}".format(x / 10), end="\r")
+
+print(str(type(policy)))
+
+display_policy(policy,2,5);
 
 
 '''
