@@ -3,9 +3,10 @@ import time
 import math
 import copy
 
-#𓃰_hey
+#𓃰
 
-##TODO check that state transitions probs add to one
+# TODO check that state transitions probs add to one
+
 
 T = 15
 minotaur_can_stay = True;
@@ -26,6 +27,7 @@ N_STATES = 901
 ACTIONS = [Stay, Up, Right, Down, Left]
 N_ACTIONS = len(ACTIONS)
 
+
 def rc2idx(rc):
 	return rc[0] * 6 + rc[1]
 
@@ -39,7 +41,7 @@ def rc_exists(rc):
 
 walls = []
 
-#define walls
+# define walls
 walls.append([rc2idx([0, 1]), rc2idx([0, 2])])
 walls.append([rc2idx([1, 1]), rc2idx([1, 2])])
 walls.append([rc2idx([2, 1]), rc2idx([2, 2])])
@@ -92,18 +94,15 @@ MINOTAUR_ACCESS = minotaur_list
 print(PLAYER_ACCESS)
 print(MINOTAUR_ACCESS)
 
-##check acess lists
+# check acess lists
 for m_idx, m in enumerate(MINOTAUR_ACCESS):
-	print("at "+str(m_idx)+" minotaur can access :"+str(m));
+	print("at " + str(m_idx) + " minotaur can access :" + str(m))
 
 for p_idx, p in enumerate(PLAYER_ACCESS):
-	print("at "+str(p_idx)+" player 1 can access :"+str(p));
-
+	print("at " + str(p_idx) + " player 1 can access :" + str(p))
 
 
 ########################## INTERESTING PART #################
-
-
 ##
 def stpf(s, a):
 	tp = np.zeros(N_STATES)
@@ -117,7 +116,7 @@ def stpf(s, a):
 		if p == m or p == 28:
 			tp[900] = 1
 		else:
-			p_try=p+a;
+			p_try = p + a
 			p_new = p_try if p_try in PLAYER_ACCESS[p] else p
 			n_m_new = len(MINOTAUR_ACCESS[m])
 			for m_new in MINOTAUR_ACCESS[m]:
@@ -133,73 +132,72 @@ def reward(s, a):
 	elif s % 30 == 28 and s // 30 != 28:
 		return 1
 	else:
-		return -0.1
+		return 0
 
-def print_board(p,m):
 
-	board_strings=[["𓐍","   ","_"," │ ","_","   ","_","   ","_","   ","_"],\
-				   [" ","   "," ","   "," ","   "," ","   "," ","   "," "],\
-				   ["_","   ","_"," │ ","_","   ","_"," │ ","_","   ","_"],\
-				   [" ","   "," ","   "," ","   "," ","   "," ","   "," "],\
-				   ["_","   ","_"," │ ","_","   ","_"," │ ","_","   ","_"],\
-				   [" ","   "," ","   "," ","   "," ","   "," ","   "," "],\
-				   ["_","   ","_","   ","_","   ","_","   ","_","   ","_"],\
-				   [" ","   "," ","   "," ","   "," ","   "," ","   "," "],\
-				   ["_","   ","_"," │ ","_","   ","_"," │ ","𓊓","   ","_"]]
-	pr,pc=idx2rc(p);
-	mr,mc=idx2rc(m);
-	out=board_strings.copy();
-	out[pr*2][pc*2]="𓁆";
-	out[mr*2][mc*2]="𓃾";
-	if m==p:
-		out[mr*2][mc*2]="✞";
-	elif p==28:
-		out[pr*2][pc*2]="𓀠";
+def print_board(p, m):
 
+	board_strings = [["𓐍", "   ", "_", " | ", "_", "   ", "_", "   ", "_", "   ", "_"],
+					 [" ", "   ", " ", "   ", " ", "   ", " ", "   ", " ", "   ", " "],
+					 ["_", "   ", "_", " │ ", "_", "   ", "_", " │ ", "_", "   ", "_"],
+					 [" ", "   ", " ", "   ", " ", "   ", " ", "   ", " ", "   ", " "],
+					 ["_", "   ", "_", " │ ", "_", "   ", "_", " │ ", "_", "   ", "_"],
+					 [" ", "   ", " ", "   ", " ", "   ", " ", "   ", " ", "   ", " "],
+					 ["_", "   ", "_", "   ", "_", "   ", "_", "   ", "_", "   ", "_"],
+					 [" ", "   ", " ", "   ", " ", "   ", " ", "   ", " ", "   ", " "],
+					 ["_", "   ", "_", " │ ", "_", "   ", "_", " │ ", "𓊓", "   ", "_"]]
+	pr, pc = idx2rc(p)
+	mr, mc = idx2rc(m)
+	out = board_strings.copy()
+	out[pr * 2][pc * 2] = "𓁆"
+	out[mr * 2][mc * 2] = "𓃾"
+	if m == p:
+		out[mr * 2][mc * 2] = "✞"
+	elif p == 28:
+		out[pr * 2][pc * 2] = "𓀠"
 
 	print("___________________________________________")
 	for l in out:
-		print("".join(l));
+		print("".join(l))
 	print("___________________________________________")
 	return
 
 
-
-def try_policy(policy, T):
+def try_policy(policy, T,print_board=False):
 	p = 0
 	m = 28
 	for t in range(0, T):
-		print_board(p,m);
-		#print(reward(p+m*30,"nothing"));
-		if p==m:
-			return False;
-		elif p==28:
-			return True;
+		if print_board:
+			print_board(p, m)
+		# print(reward(p+m*30,"nothing"));
+		if p == m:
+			return False
+		elif p == 28:
+			return True
 		#print("player is at :" + str(p))
 		#print("minotaur is at :" + str(m))
 		state = p + m * 30
-		a_idx = policy[state]
+		a_idx = policy[state,t]
 		p = p + ACTIONS[a_idx] if p + ACTIONS[a_idx] in PLAYER_ACCESS[p] else p
 		m = MINOTAUR_ACCESS[m][math.floor(
 			np.random.uniform(0, len(MINOTAUR_ACCESS[m])))]
-	return False;
+	return False
 
-def display_policy(policy,t,m):
 
-	policy_wrt_m=policy[m*30:m*30+30];
-	action_icons=["⧖","⥣","⥤","⥥","⥢"];
-	minotaur_icon="𓃾";
-			
-	policy_str=[action_icons[a] for a in policy_wrt_m]
-	policy_str[m]=minotaur_icon;
-	for r in range(0,5):
-		print('  '.join(policy_str[r*6:r*6+6]))
+def display_policy(policy, t, m):
+
+	policy_wrt_m = policy[m * 30:m * 30 + 30]
+	action_icons = ["⧖", "⥣", "⥤", "⥥", "⥢"]
+	minotaur_icon = "𓃾"
+
+	policy_str = [action_icons[a] for a in policy_wrt_m]
+	policy_str[m] = minotaur_icon
+	for r in range(0, 5):
+		print('  '.join(policy_str[r * 6:r * 6 + 6]))
 	return
 
 
-
-
-#precompute transition probability matrix.
+# precompute transition probability matrix.
 stps = np.zeros((N_STATES, N_STATES, N_ACTIONS))
 for a_idx, action in enumerate(ACTIONS):
 	for state in range(0, N_STATES):
@@ -207,47 +205,39 @@ for a_idx, action in enumerate(ACTIONS):
 
 rewards = np.zeros((N_STATES, N_ACTIONS))
 
-#precompute rewards
+# precompute rewards
 for state in range(0, N_STATES):
 	for a_idx, action in enumerate(ACTIONS):
 		rewards[state, a_idx] = reward(state, action)
 
-
-#Bellman induction
-u_star = np.amax(rewards, 1)
-
-print(rewards)
-
-print(np.sum(u_star))
-u_a = np.argmax(rewards, 1)
-
-
-for t in range(T, 1, -1):
-	u = np.zeros((N_STATES, N_ACTIONS))
-	for s_idx in range(0, N_STATES):
-		for a_idx in range(0, N_ACTIONS):
-			u[s_idx, a_idx] = np.sum(stps[s_idx, :, a_idx]@u_star) + rewards[s_idx, a_idx]
-	u_star = np.amax(u, 1)
-	u_a = np.argmax(u, 1)
-	# print(u_star)
-
-
-policy = u_a
+#Returns a N_STATES*T policy matrix
+def bellman_induction(stps,rewards,T):
+	# Bellman induction
+	policy=np.zeros((N_STATES,T),dtype=np.int8);
+	u_star = np.amax(rewards, 1)
+	print(np.sum(u_star))
+	u_a = np.argmax(rewards, 1)
+	policy[:,T-1]=u_a;
+	for t in range(T-2, 0, -1):
+		u = np.zeros((N_STATES, N_ACTIONS))
+		for s_idx in range(0, N_STATES):
+			for a_idx in range(0, N_ACTIONS):
+				u[s_idx, a_idx] = np.sum(stps[s_idx, :, a_idx]@u_star) + rewards[s_idx, a_idx]
+		u_star = np.amax(u, 1)
+		u_a = np.argmax(u, 1)
+		policy[:,t]=u_a;
+		# print(u_star)
+	return policy
 
 
-##print policy
-for i in range(0, 30):
-	print(np.size(policy[i * 30:i * 30 + 31]))
-	print(policy[i * 30:i * 30 + 30])
+policy=bellman_induction(stps,rewards,T)
 
 try_policy(policy, T)
 
-display_policy(policy,10,1)
-
 for x in range(100000):
-    print("Progress {:2.1%}".format(x / 10), end="\r")
+	print("Progress {:2.1%}".format(x / 10), end="\r")
 
-'''
+
 N=10000
 wins=0;
 for i in range(N):
@@ -255,6 +245,4 @@ for i in range(N):
 		wins+=1;
 
 print("won "+str(wins)+" out of "+str(N)+" games! ("+str(100*wins/N)+"%)")
-'''
-
 
