@@ -163,11 +163,11 @@ def print_board(p, m):
 	return
 
 
-def try_policy(policy, T,print_board=False):
+def try_policy(policy, T,print=False):
 	p = 0
 	m = 28
 	for t in range(0, T):
-		if print_board:
+		if print:
 			print_board(p, m)
 		# print(reward(p+m*30,"nothing"));
 		if p == m:
@@ -232,12 +232,13 @@ def bellman_induction(stps,rewards,T):
 
 policy=bellman_induction(stps,rewards,T)
 
-try_policy(policy, T)
+try_policy(policy, T, True)
 
 for x in range(100000):
 	print("Progress {:2.1%}".format(x / 10), end="\r")
 
 
+'''
 N=10000
 wins=0;
 for i in range(N):
@@ -245,4 +246,4 @@ for i in range(N):
 		wins+=1;
 
 print("won "+str(wins)+" out of "+str(N)+" games! ("+str(100*wins/N)+"%)")
-
+'''
