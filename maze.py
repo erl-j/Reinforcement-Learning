@@ -3,6 +3,8 @@ import time
 import math
 import copy
 
+#𓃰_hey
+
 ##TODO check that state transitions probs add to one
 
 T = 15
@@ -210,6 +212,7 @@ for state in range(0, N_STATES):
 	for a_idx, action in enumerate(ACTIONS):
 		rewards[state, a_idx] = reward(state, action)
 
+
 #Bellman induction
 u_star = np.amax(rewards, 1)
 
@@ -240,6 +243,9 @@ for i in range(0, 30):
 try_policy(policy, T)
 
 display_policy(policy,10,1)
+
+for x in range(100000):
+    print("Progress {:2.1%}".format(x / 10), end="\r")
 
 '''
 N=10000
