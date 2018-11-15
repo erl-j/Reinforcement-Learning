@@ -1,4 +1,5 @@
 import numpy as np
+import os;
 import time
 import math
 import copy
@@ -148,6 +149,7 @@ def print_board(p, m):
 					 ["_", "   ", "_", " │ ", "_", "   ", "_", " │ ", "𓊓", "   ", "_"]]
 
 
+
 	pr, pc = idx2rc(p)
 	mr, mc = idx2rc(m)
 	out = board_strings.copy()
@@ -165,11 +167,12 @@ def print_board(p, m):
 	return
 
 
-def try_policy(policy, T,print=False):
+def try_policy(policy, T,_print=False):
 	p = 0
 	m = 28
 	for t in range(0, T):
-		if print:
+		if _print:
+			print("at "+str(t))
 			print_board(p, m)
 		# print(reward(p+m*30,"nothing"));
 		if p == m:
@@ -184,6 +187,44 @@ def try_policy(policy, T,print=False):
 		m = MINOTAUR_ACCESS[m][math.floor(
 			np.random.uniform(0, len(MINOTAUR_ACCESS[m])))]
 	return False
+
+def clear():
+    os.system( 'clear' )
+
+def play(policy,T):
+	p = 0
+	m = 28
+	for t in range(0, T):
+		clear()
+		print_board(p, m)
+		# print(reward(p+m*30,"nothing"));
+		if p == m:
+			return False
+		elif p == 28:
+			return True
+		#print("player is at :" + str(p))
+		#print("minotaur is at :" + str(m))
+		state = p + m * 30
+		a_idx = policy[state,t]
+		p = p + ACTIONS[a_idx] if p + ACTIONS[a_idx] in PLAYER_ACCESS[p] else p
+		m_action_index=get_minotaur_action();
+		m_try=m+ACTIONS[m_action_index];
+		m=m_try if m_try in MINOTAUR_ACCESS[m] else m;
+	return False
+
+def get_minotaur_action():
+	valid_input=["","w","d","s","a"];
+	if not minotaur_can_stay:
+		valid_input.remove("");
+	key="dummy";
+	while key not in valid_input:
+		key = input("Type next move!");
+
+	action_index=valid_input.index(key);
+	if not minotaur_can_stay:
+		action_index+=1;
+	return action_index;
+
 
 
 def display_policy(policy, t, m):
@@ -234,7 +275,8 @@ def bellman_induction(stps,rewards,T):
 
 policy=bellman_induction(stps,rewards,T)
 
-try_policy(policy, T, True)
+#try_policy(policy, T, True)
+play(policy,T)
 
 for x in range(100000):
 	print("Progress {:2.1%}".format(x / 10), end="\r")
