@@ -21,21 +21,21 @@ N_POLICE_ACTIONS = len(POLICE_ACTIONS)
 
 N_STATES = N_TILES**2
 
-INITAL_STATE=0;
+INITIAL_STATE=0+15*N_TILES;
 
 # PARAMETERS
 
 n_iterations=10**6;
 discount_factor = 0.8
-learning_rate=0.05;
+learning_rate=0.01;
 
 ##PLOTTING PARAMS
 
-ivs_step=100;
+ivs_step=10000;
 
 
 
-def rc2idx(rc):
+def rc2idx(rc):	
     '''Converts row column position to index'''
     return rc[0] * BOARD_WIDTH + rc[1]
 
@@ -97,18 +97,23 @@ def next_state(state, action):
     new_police_idx = move(police_idx, police_move)
     return ai2si(new_player_idx, new_police_idx)
 
+def try_policy(policy,T):
+	state=INITIAL_STATE
+	total_reward=0;
+	for t in range(T):
+		action=policy[state];
+		total_reward+=reward(state,action);
+		state=next_state(state,action);
+	return total_reward;
+
+
 # initialize Q
 #Q = np.random.uniform(-1, 1, size=(N_STATES, N_ROBBER_ACTIONS))
-Q = np.ones((N_STATES,N_ROBBER_ACTIONS))
-
-rewards = np.zeros((N_STATES, N_ROBBER_ACTIONS))
-for state in range(0, N_STATES):
-	for a_idx, action in enumerate(ROBBER_ACTIONS):
-		rewards[state, a_idx] = reward(state, action)
+Q = np.ones((N_STATES,N_ROBBER_ACTIONS))*0.5;
 
 initial_state_value=np.zeros(int(n_iterations/ivs_step));
 
-
+##Q-learning
 state=np.random.randint(0,N_STATES);
 for t in range(0,n_iterations):
 	action=ROBBER_ACTIONS[int(np.random.uniform(0, N_ROBBER_ACTIONS))];
@@ -116,11 +121,15 @@ for t in range(0,n_iterations):
 	Q[state,action]=(1-learning_rate)*Q[state,action]+learning_rate*(reward(state,action)+discount_factor*np.max(Q[new_state,:]));
 	state=new_state;
 	if t%ivs_step==0:
-		print(Q[INITAL_STATE,:])
-		initial_state_value[int(t/ivs_step)]=np.max(Q[INITAL_STATE,:]);
+		print("training..("+str(100*t/n_iterations)+"% complete)",end="\r");
+		#print(Q[INITIAL_STATE,:])
+		initial_state_value[int(t/ivs_step)]=np.max(Q[INITIAL_STATE,:]);
 
+policy=np.argmax(Q,1);
 
+T_trial=1000;
 
+print("\nReturn from policy over {} timesteps: {}".format(T_trial,try_policy(policy,T_trial)));
 
 plt.plot(initial_state_value);
 
