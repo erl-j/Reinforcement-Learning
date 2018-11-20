@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt;
 
 # TODO check that state transitions probs add to one
 
-P_DEATH=1/50;
+P_DEATH=1/30;
 T = 500;
-minotaur_can_stay = False;
+minotaur_can_stay = True;
 
 STAY = np.array([0, 0])
 UP = np.array([0, 1])
@@ -130,7 +130,7 @@ def reward(s, a):
 	elif s % 30 == 28 and s // 30 != 28:
 		return 1
 	else:
-		return -1
+		return 0
 
 
 def print_board(p, m):
@@ -297,9 +297,6 @@ print("won "+str(wins)+" out of "+str(N)+" games! ("+str(100*wins/N)+"%)")
 print("mean win time: {}".format(mean_win_time))
 
 
-for a_idx in range(N_ACTIONS):
-	for s in range(N_STATES):
-		print(np.sum(stps[s,:,a_idx]))
 
 #plt.hist(t_win,1000);
 #plt.show()
