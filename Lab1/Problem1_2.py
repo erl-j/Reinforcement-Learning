@@ -277,9 +277,6 @@ policy=bellman_induction(stps,rewards,T)
 try_policy(policy, T, True)
 #play(policy,T)
 
-for x in range(100000):
-	print("Progress {:2.1%}".format(x / 10), end="\r")
-
 display_policy(policy,2,5);
 
 
