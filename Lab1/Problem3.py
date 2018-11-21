@@ -120,6 +120,9 @@ def display_board(state):
 	player_idx,police_idx=si2ai(state);
 	board_strings[player_idx // BOARD_WIDTH][player_idx%BOARD_WIDTH]="R";
 	board_strings[police_idx // BOARD_WIDTH][police_idx%BOARD_WIDTH]="P";
+	if player_idx==police_idx:
+		board_strings[player_idx // BOARD_WIDTH][player_idx%BOARD_WIDTH]="✞";
+
 	for l in board_strings:
 		print("".join(l))
 	return
