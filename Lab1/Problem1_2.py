@@ -166,6 +166,8 @@ def print_board(p, m):
 	print("___________________________________________")
 	return
 
+def clear():
+    os.system( 'clear' )
 
 def try_policy(policy, T,_print=False):
 	p = 0
@@ -253,7 +255,7 @@ for state in range(0, N_STATES):
 		rewards[state, a_idx] = reward(state, action)
 
 #Returns a N_STATES*T policy matrix
-def bellman_induction(stps,rewards,T):
+def backward_induction(stps,rewards,T):
 	# Bellman induction
 	policy=np.zeros((N_STATES,T),dtype=np.int8);
 	u_star = np.amax(rewards, 1)
@@ -272,7 +274,7 @@ def bellman_induction(stps,rewards,T):
 	return policy
 
 
-policy=bellman_induction(stps,rewards,T)
+policy=backward_induction(stps,rewards,T)
 
 try_policy(policy, T, True)
 #play(policy,T)
