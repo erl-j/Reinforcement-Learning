@@ -25,7 +25,7 @@ N_STATES = N_TILES**2
 INITIAL_STATE=0+15*N_TILES;
 
 # PARAMETERS
-n_iterations=10**6;
+n_iterations=10**7;
 discount_factor = 0.8
 
 ##PLOTTING PARAMS
@@ -132,7 +132,7 @@ def Q_learning(n_iterations):
 	print("START Q-learning")
 	# initialize Q
 	Q = np.ones((N_STATES,N_ROBBER_ACTIONS))*0.5;
-	initial_state_value=np.zeros(int(n_iterations/ivs_step));
+	initial_state_value=np.zeros((int(n_iterations/ivs_step),N_ROBBER_ACTIONS));
 	n_updates=np.ones((N_STATES,N_ROBBER_ACTIONS));
 	##Q-learning
 	state=np.random.randint(0,N_STATES);
@@ -143,17 +143,19 @@ def Q_learning(n_iterations):
 		#learning_rate=0.02;
 		Q[state,action_idx]=(1-step_size)*Q[state,action_idx]+step_size*(reward(state,action_idx)+discount_factor*np.max(Q[new_state,:]));
 		state=new_state;
+		n_updates[state,action_idx]+=1;
 		if t%ivs_step==0:
 			print("training..("+str(100*t/n_iterations)+"% complete)",end="\r");
 			#print(Q[INITIAL_STATE,:])
-			initial_state_value[int(t/ivs_step)]=np.max(Q[INITIAL_STATE,:]);
+			initial_state_value[int(t/ivs_step)]=(Q[INITIAL_STATE,:]);
 	policy=np.argmax(Q,1);
 	return policy,initial_state_value
 
 def SARSA(n_iterations,epsilon):
 	print("START SARSA")
 	Q = np.ones((N_STATES,N_ROBBER_ACTIONS))*0;
-	initial_state_value=np.zeros(int(n_iterations/ivs_step));
+	initial_state_value=np.zeros((int(n_iterations/ivs_step),N_ROBBER_ACTIONS));
+	n_updates=np.ones((N_STATES,N_ROBBER_ACTIONS));
 	state=np.random.randint(0,N_STATES);
 	for t in range(n_iterations):
 		if np.random.uniform(0,1)<epsilon:	
@@ -161,25 +163,28 @@ def SARSA(n_iterations,epsilon):
 		else:
 			policy=np.argmax(Q,1);
 			action_idx=policy[state];
-		step_size=0.02;
+		step_size=1/(n_updates[state,action_idx])**(2/3);
 		new_state=next_state(state,action_idx);
 		Q[state,action_idx]=Q[state,action_idx]+step_size*(reward(state,action_idx)+discount_factor*np.max(Q[new_state,:])-Q[state,action_idx]);
 		state=new_state;
+		n_updates[state,action_idx]+=1;
 		if t%ivs_step==0:
 			print("training..("+str(100*t/n_iterations)+"% complete)",end="\r");
 			#print(Q[INITIAL_STATE,:])
-			initial_state_value[int(t/ivs_step)]=np.max(Q[INITIAL_STATE,:]);
+			initial_state_value[int(t/ivs_step)]=(Q[INITIAL_STATE,:]);
 	policy=np.argmax(Q,1);
 	return policy,initial_state_value
 
 
-#policy,initial_state_value=Q_learning(n_iterations);
-policy,initial_state_value=SARSA(n_iterations,0.1);
+policy,initial_state_value=Q_learning(n_iterations);
+#policy,initial_state_value=SARSA(n_iterations,0.1);
 
 T_trial=1000;
-
-print("\nReturn from policy over {} timesteps: {}".format(T_trial,try_policy(policy,T_trial,True)));
 
 plt.plot(initial_state_value);
 
 plt.show();
+
+print("\nReturn from policy over {} timesteps: {}".format(T_trial,try_policy(policy,T_trial,True)));
+
+
