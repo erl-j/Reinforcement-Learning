@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import time;
 
 
-discount_factor=0.7;
+discount_factor=0.99;
 
 # GAME PROPRETIES
 BOARD_WIDTH = 6
@@ -164,6 +164,7 @@ def try_policy(policy, T,_print=False):
 
 		if p == m:
 			reward-=50;
+			print("Died")
 		elif p in BANK_IDXS:
 			reward+=10;
 
@@ -187,6 +188,18 @@ def try_policy(policy, T,_print=False):
 
 def clear():
     os.system( 'clear' )
+
+def display_policy(policy, m):
+
+	policy_wrt_m = policy[m * N_TILES:m * N_TILES + N_TILES]
+	action_icons = ["⧖", "⥣", "⥤", "⥥", "⥢"]
+	minotaur_icon = "𓃾"
+	policy_str = [action_icons[a] for a in policy_wrt_m]
+	policy_str[m] = minotaur_icon
+	for r in range(0, 5):
+		print('  '.join(policy_str[r * BOARD_WIDTH:r * BOARD_WIDTH + BOARD_WIDTH]))
+	return
+
 
 def display_board(state):
 	clear();
@@ -214,7 +227,7 @@ def backward_induction(stps,rewards,T):
 		u = np.zeros((N_STATES, N_ROBBER_ACTIONS))
 		for s_idx in range(0, N_STATES):
 			for a_idx in range(0, N_ROBBER_ACTIONS):
-				u[s_idx, a_idx] = discount_factor*np.sum(stps[s_idx, :, a_idx]@u_star) + rewards[s_idx, a_idx]
+				u[s_idx, a_idx] += discount_factor*np.sum(stps[s_idx, :, a_idx]@u_star) + rewards[s_idx, a_idx]
 		u_star = np.amax(u, 1)
 		u_a = np.argmax(u, 1)
 	policy=u_a;
@@ -227,7 +240,10 @@ def backward_induction(stps,rewards,T):
 
 policy=backward_induction(stps,rewards,1000);
 
-try_policy(policy,1000,True)
+try_policy(policy,10,True)
+
+for police_idx in range(0,N_TILES):
+	display_policy(policy,police_idx)
 
 
 
