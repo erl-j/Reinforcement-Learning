@@ -3,7 +3,7 @@ import os;
 import time
 import math
 import copy
-
+import matplotlib.pyplot as plt
 #𓃰
 
 # TODO check that state transitions probs add to one
@@ -72,14 +72,11 @@ for idx in range(0, 6 * 5):
 player_list = copy.deepcopy(access_list)
 minotaur_list = copy.deepcopy(access_list)
 
-print("a :" + str(player_list))
 
 # player can't traverse walls
 for wall in walls:
 	player_list[wall[0]].remove(wall[1])
 	player_list[wall[1]].remove(wall[0])
-
-print("b :" + str(player_list))
 
 
 # minotaur can't stay in place
@@ -87,20 +84,19 @@ if not minotaur_can_stay:
 	for m_idx, mi in enumerate(minotaur_list):
 		mi.remove(m_idx)
 
-print("d :" + str(player_list))
 
 PLAYER_ACCESS = player_list
 MINOTAUR_ACCESS = minotaur_list
 
-print(PLAYER_ACCESS)
-print(MINOTAUR_ACCESS)
 
+def print_acess_list():
 # check acess lists
-for m_idx, m in enumerate(MINOTAUR_ACCESS):
-	print("at " + str(m_idx) + " minotaur can access :" + str(m))
+	for m_idx, m in enumerate(MINOTAUR_ACCESS):
+		print("at " + str(m_idx) + " minotaur can access :" + str(m))
 
-for p_idx, p in enumerate(PLAYER_ACCESS):
-	print("at " + str(p_idx) + " player 1 can access :" + str(p))
+	for p_idx, p in enumerate(PLAYER_ACCESS):
+		print("at " + str(p_idx) + " player 1 can access :" + str(p))
+	return 
 
 
 ########################## INTERESTING PART #################
@@ -178,9 +174,9 @@ def try_policy(policy, T,_print=False):
 			print_board(p, m)
 		# print(reward(p+m*30,"nothing"));
 		if p == m:
-			return False
+			return False,t
 		elif p == 28:
-			return True
+			return True,t
 		#print("player is at :" + str(p))
 		#print("minotaur is at :" + str(m))
 		state = p + m * 30
@@ -188,7 +184,7 @@ def try_policy(policy, T,_print=False):
 		p = p + ACTIONS[a_idx] if p + ACTIONS[a_idx] in PLAYER_ACCESS[p] else p
 		m = MINOTAUR_ACCESS[m][math.floor(
 			np.random.uniform(0, len(MINOTAUR_ACCESS[m])))]
-	return False
+	return False,t
 
 def clear():
     os.system( 'clear' )
@@ -279,17 +275,28 @@ policy=backward_induction(stps,rewards,T)
 try_policy(policy, T, True)
 #play(policy,T)
 
-for t in range(0,5,15):
-	for m in range(0,3,30)
-	display_policy(policy,2,5);
+for t in range(1,T,3):
+	for m in range(1,30,5):
+		print("\n")
+		print("t = {},m_pos = {}".format(t,m))
+		display_policy(policy,t,m);
 
 
-'''
+
 N=10000
 wins=0;
+wins_per_time=np.zeros(T);
 for i in range(N):
-	if try_policy(policy,T):
+	isWin,time=try_policy(policy,T)
+	if isWin:
 		wins+=1;
+		wins_per_time[time]+=1;
+
+
+
 
 print("won "+str(wins)+" out of "+str(N)+" games! ("+str(100*wins/N)+"%)")
-'''
+
+plt.plot(wins_per_time);
+plt.show();
+
