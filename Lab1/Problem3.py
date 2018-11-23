@@ -132,7 +132,7 @@ def Q_learning(n_iterations):
 	print("START Q-learning")
 	# initialize Q
 	Q = np.ones((N_STATES,N_ROBBER_ACTIONS))*0.5;
-	initial_state_value=np.zeros((int(n_iterations/ivs_step),N_ROBBER_ACTIONS));
+	initial_state_value=np.zeros((n_iterations,N_ROBBER_ACTIONS));
 	n_updates=np.ones((N_STATES,N_ROBBER_ACTIONS));
 	##Q-learning
 	state=np.random.randint(0,N_STATES);
@@ -147,14 +147,14 @@ def Q_learning(n_iterations):
 		if t%ivs_step==0:
 			print("training..("+str(100*t/n_iterations)+"% complete)",end="\r");
 			#print(Q[INITIAL_STATE,:])
-			initial_state_value[int(t/ivs_step)]=(Q[INITIAL_STATE,:]);
+		initial_state_value[t]=(Q[INITIAL_STATE,:]);
 	policy=np.argmax(Q,1);
 	return policy,initial_state_value
 
 def SARSA(n_iterations,epsilon):
 	print("START SARSA")
 	Q = np.ones((N_STATES,N_ROBBER_ACTIONS))*0;
-	initial_state_value=np.zeros((int(n_iterations/ivs_step),N_ROBBER_ACTIONS));
+	initial_state_value=np.zeros((n_iterations,N_ROBBER_ACTIONS));
 	n_updates=np.ones((N_STATES,N_ROBBER_ACTIONS));
 	state=np.random.randint(0,N_STATES);
 	for t in range(n_iterations):
@@ -171,13 +171,15 @@ def SARSA(n_iterations,epsilon):
 		if t%ivs_step==0:
 			print("training..("+str(100*t/n_iterations)+"% complete)",end="\r");
 			#print(Q[INITIAL_STATE,:])
-			initial_state_value[int(t/ivs_step)]=(Q[INITIAL_STATE,:]);
+		initial_state_value[t]=(Q[INITIAL_STATE,:]);
 	policy=np.argmax(Q,1);
 	return policy,initial_state_value
 
 
-policy,initial_state_value=Q_learning(n_iterations);
-#policy,initial_state_value=SARSA(n_iterations,0.1);
+
+
+#policy,initial_state_value=Q_learning(n_iterations);
+policy,initial_state_value=SARSA(n_iterations,0.1);
 
 T_trial=1000;
 

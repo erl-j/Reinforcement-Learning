@@ -279,7 +279,9 @@ policy=backward_induction(stps,rewards,T)
 try_policy(policy, T, True)
 #play(policy,T)
 
-display_policy(policy,2,5);
+for t in range(0,5,15):
+	for m in range(0,3,30)
+	display_policy(policy,2,5);
 
 
 '''
