@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 
 T = 15
-minotaur_can_stay = True;
+minotaur_can_stay = False;
 
 STAY = np.array([0, 0])
 UP = np.array([0, 1])
@@ -184,7 +184,7 @@ def try_policy(policy, T,_print=False):
 		p = p + ACTIONS[a_idx] if p + ACTIONS[a_idx] in PLAYER_ACCESS[p] else p
 		m = MINOTAUR_ACCESS[m][math.floor(
 			np.random.uniform(0, len(MINOTAUR_ACCESS[m])))]
-	return False,t
+	return False,T
 
 def clear():
     os.system( 'clear' )
@@ -255,7 +255,6 @@ def backward_induction(stps,rewards,T):
 	# Bellman induction
 	policy=np.zeros((N_STATES,T),dtype=np.int8);
 	u_star = np.amax(rewards, 1)
-	print(np.sum(u_star))
 	u_a = np.argmax(rewards, 1)
 	policy[:,T-1]=u_a;
 	for t in range(T-2, 0, -1):
@@ -272,8 +271,35 @@ def backward_induction(stps,rewards,T):
 
 policy=backward_induction(stps,rewards,T)
 
-try_policy(policy, T, True)
+#try_policy(policy, T, True)
 #play(policy,T)
+
+
+N=1000
+bigbigT=60
+win_rate_per_T=np.zeros(bigbigT)
+for T in range(0,bigbigT):
+	print("T = {}".format(T),end="\r")
+	wins=0;
+	policy=backward_induction(stps,rewards,T+1)
+	for game in range(N):
+		isWin,throw=try_policy(policy, T+1, False)
+		if isWin:
+			wins+=1;
+	win_rate_per_T[T]=wins/N;
+
+plt.bar(np.arange(bigbigT)+1,win_rate_per_T);
+
+plt.xlabel('Time Horizon')
+plt.ylabel('Win rate')
+
+plt.title("Win rate for different T (Minotaur can't stay)")
+
+plt.show();
+
+
+
+
 
 for t in range(1,T,3):
 	for m in range(1,30,5):
@@ -283,20 +309,7 @@ for t in range(1,T,3):
 
 
 
-N=10000
-wins=0;
-wins_per_time=np.zeros(T);
-for i in range(N):
-	isWin,time=try_policy(policy,T)
-	if isWin:
-		wins+=1;
-		wins_per_time[time]+=1;
-
-
-
-
 print("won "+str(wins)+" out of "+str(N)+" games! ("+str(100*wins/N)+"%)")
 
-plt.plot(wins_per_time);
-plt.show();
+
 

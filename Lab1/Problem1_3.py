@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt;
 
 P_DEATH=1/30;
 T = 500;
-minotaur_can_stay = True;
+minotaur_can_stay = False;
 
 STAY = np.array([0, 0])
 UP = np.array([0, 1])
@@ -168,23 +168,22 @@ def try_policy(policy, T,_print=False):
 	p = 0
 	m = 28
 	for t in range(0, T):
-		if _print:
-			print("at "+str(t))
-			print_board(p, m)
-		# print(reward(p+m*30,"nothing"));
-		if p == m:
+		if np.random.uniform(0,1)<1/30:
 			return False,t
-		elif p == 28:
-			return True,t
-		#print("player is at :" + str(p))
-		#print("minotaur is at :" + str(m))
-		state = p + m * 30
-		a_idx = policy[state,t]
-		p = p + ACTIONS[a_idx] if p + ACTIONS[a_idx] in PLAYER_ACCESS[p] else p
-		isDead=np.random.uniform(0,1)<P_DEATH
-		if isDead:
-			m=p;
 		else:
+			if _print:
+				print("at "+str(t))
+				print_board(p, m)
+			# print(reward(p+m*30,"nothing"));
+			if p == m:
+				return False,t
+			elif p == 28:
+				return True,t
+			#print("player is at :" + str(p))
+			#print("minotaur is at :" + str(m))
+			state = p + m * 30
+			a_idx = policy[state,t]
+			p = p + ACTIONS[a_idx] if p + ACTIONS[a_idx] in PLAYER_ACCESS[p] else p
 			m = MINOTAUR_ACCESS[m][math.floor(
 			np.random.uniform(0, len(MINOTAUR_ACCESS[m])))]
 	return False,t

@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from collections import OrderedDict
 import time;
 
 # GAME PROPRETIES
@@ -131,7 +132,7 @@ def display_board(state):
 def Q_learning(n_iterations):	
 	print("START Q-learning")
 	# initialize Q
-	Q = np.ones((N_STATES,N_ROBBER_ACTIONS))*0.5;
+	Q = np.zeros((N_STATES,N_ROBBER_ACTIONS));
 	initial_state_value=np.zeros((n_iterations,N_ROBBER_ACTIONS));
 	n_updates=np.ones((N_STATES,N_ROBBER_ACTIONS));
 	##Q-learning
@@ -147,7 +148,7 @@ def Q_learning(n_iterations):
 		if t%ivs_step==0:
 			print("training..("+str(100*t/n_iterations)+"% complete)",end="\r");
 			#print(Q[INITIAL_STATE,:])
-		initial_state_value[t]=(Q[INITIAL_STATE,:]);
+		initial_state_value[t]=np.max(Q[INITIAL_STATE,:]);
 	policy=np.argmax(Q,1);
 	return policy,initial_state_value
 
@@ -171,22 +172,56 @@ def SARSA(n_iterations,epsilon):
 		if t%ivs_step==0:
 			print("training..("+str(100*t/n_iterations)+"% complete)",end="\r");
 			#print(Q[INITIAL_STATE,:])
-		initial_state_value[t]=(Q[INITIAL_STATE,:]);
+		initial_state_value[t]=np.max(Q[INITIAL_STATE,:]);
 	policy=np.argmax(Q,1);
 	return policy,initial_state_value
 
 
 
 
-#policy,initial_state_value=Q_learning(n_iterations);
-policy,initial_state_value=SARSA(n_iterations,0.1);
 
-T_trial=1000;
 
-plt.plot(initial_state_value);
+policy,initial_state_value=Q_learning(n_iterations);
+#policy,initial_state_value=SARSA(n_iterations,0.1);
+
+'''
+epsilons=[0.01,0.05,0.1,0.2,0.6];
+ivs=epsilons.copy();
+
+c = ['#ddb464','#83192d','#451930','#211b29','#6d8a90']
+
+for e_idx,eps in enumerate(epsilons):
+	policy,ivs[e_idx]=SARSA(n_iterations,eps);
+	plt.plot(ivs[e_idx],color=c[e_idx],label="epsilon = {}".format(eps));
+
+
+handles, labels = plt.gca().get_legend_handles_labels()
+by_label = OrderedDict(zip(labels, handles))
+plt.legend(by_label.values(), by_label.keys())
+plt.xlabel('Iteration')
+plt.ylabel('initial state value')
+
+plt.title("SARSA with different epsilon")
+
 
 plt.show();
 
+'''
+
+
+
+plt.plot(initial_state_value);
+
+plt.xlabel('Iteration')
+plt.ylabel('initial state value')
+
+plt.title("Q-learning")
+
+plt.show();
+
+T_trial=1000;
+
 print("\nReturn from policy over {} timesteps: {}".format(T_trial,try_policy(policy,T_trial,True)));
+
 
 
