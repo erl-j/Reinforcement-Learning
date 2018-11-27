@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import time;
 
 
-discount_factor=0.99;
+
 
 # GAME PROPRETIES
 BOARD_WIDTH = 6
@@ -218,8 +218,8 @@ def display_board(state):
 	return
 
 #Returns a N_STATES*T policy matrix
-def backward_induction(stps,rewards,T):
-	# Bellman induction
+def backward_induction(stps,rewards,T,discount_factor):
+	# works but not really what is instructed in lecture notes
 	policy=np.zeros((N_STATES,T),dtype=np.int8);
 	u_star = np.amax(rewards, 1)
 	u_a = np.argmax(rewards, 1)
@@ -234,11 +234,49 @@ def backward_induction(stps,rewards,T):
 		# print(u_star)
 	return policy
 
+def howards_policy_iteration(stps,rewards,discount_factor):
+	#new_policy=np.random.randint(0,N_ROBBER_ACTIONS,size=N_STATES);
+	new_policy=np.ones(N_STATES,dtype=np.int8)
+	policy=np.zeros(N_STATES,dtype=np.int8);
+	V=np.zeros(N_STATES);
+	u=np.zeros((N_STATES,N_ROBBER_ACTIONS))
+	while not np.array_equal(new_policy, policy):
+		print("running howards_policy_iteration..",end="\r")
+		policy=new_policy;
+		for s_idx in range(N_STATES):
+			V[s_idx]=rewards[s_idx,policy[s_idx]]+discount_factor*(stps[s_idx,:,policy[s_idx]]@V);
+		for s_idx in range(0, N_STATES):
+				for a_idx in range(0, N_ROBBER_ACTIONS):
+					u[s_idx, a_idx] = discount_factor*np.sum(stps[s_idx, :, a_idx]@V) + rewards[s_idx, a_idx]
+		new_policy=np.argmax(u,1);
+		initial_state_value=np.max(u[INITIAL_STATE,:]);
+	return policy, initial_state_value;
+
+
+
+lambdas=np.arange(0.0,1,0.001)
+ivs=lambdas.copy();
+for l_idx,lam in enumerate(lambdas):
+	policy,ivs[l_idx]=howards_policy_iteration(stps,rewards,lam);
+
+#policy,initial_state_value=SARSA(n_iterations,0.1);
+
+
+plt.plot(lambdas,ivs);
+
+plt.xlabel("discount_factor");
+plt.ylabel("initial state value")
+
+
+plt.title("Initial state value for different lambda")
+
+
+plt.show();
 
 
 
 
-policy=backward_induction(stps,rewards,1000);
+
 
 try_policy(policy,10,True)
 
