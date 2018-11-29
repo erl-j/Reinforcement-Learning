@@ -139,17 +139,19 @@ def Q_learning(n_iterations):
 	state=np.random.randint(0,N_STATES);
 	for t in range(0,n_iterations):
 		action_idx=int(np.random.uniform(0, N_ROBBER_ACTIONS));
+		#print(action_idx)
 		new_state=next_state(state,action_idx);
 		step_size=1/(n_updates[state,action_idx])**(2/3);
 		#learning_rate=0.02;
 		Q[state,action_idx]=(1-step_size)*Q[state,action_idx]+step_size*(reward(state,action_idx)+discount_factor*np.max(Q[new_state,:]));
-		state=new_state;
 		n_updates[state,action_idx]+=1;
+		state=new_state;
 		if t%ivs_step==0:
 			print("training..("+str(100*t/n_iterations)+"% complete)",end="\r");
 			#print(Q[INITIAL_STATE,:])
 		initial_state_value[t]=np.max(Q[INITIAL_STATE,:]);
 	policy=np.argmax(Q,1);
+	print(n_updates)
 	return policy,initial_state_value
 
 def SARSA(n_iterations,epsilon):
@@ -167,8 +169,8 @@ def SARSA(n_iterations,epsilon):
 		step_size=1/(n_updates[state,action_idx])**(2/3);
 		new_state=next_state(state,action_idx);
 		Q[state,action_idx]=Q[state,action_idx]+step_size*(reward(state,action_idx)+discount_factor*np.max(Q[new_state,:])-Q[state,action_idx]);
-		state=new_state;
 		n_updates[state,action_idx]+=1;
+		state=new_state;
 		if t%ivs_step==0:
 			print("training..("+str(100*t/n_iterations)+"% complete)",end="\r");
 			#print(Q[INITIAL_STATE,:])
@@ -209,7 +211,6 @@ plt.show();
 '''
 
 
-
 plt.plot(initial_state_value);
 
 plt.xlabel('Iteration')
@@ -221,7 +222,7 @@ plt.show();
 
 T_trial=1000;
 
-print("\nReturn from policy over {} timesteps: {}".format(T_trial,try_policy(policy,T_trial,True)));
+#print("\nReturn from policy over {} timesteps: {}".format(T_trial,try_policy(policy,T_trial,True)));
 
 
 
