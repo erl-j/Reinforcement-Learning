@@ -16,7 +16,7 @@ class DQNAgent:
     #Constructor for the agent (invoked when DQN is first called in main)
     def __init__(self, state_size, action_size):
         self.check_solve = False	#If True, stop if you satisfy solution confition
-        self.render = False        #If you want to see Cartpole learning, then change to True
+        self.render = True        #If you want to see Cartpole learning, then change to True
 
         #Get size of state and action
         self.state_size = state_size
@@ -26,14 +26,14 @@ class DQNAgent:
 ################################################################################
         #Set hyper parameters for the DQN. Do not adjust those labeled as Fixed.
         self.discount_factor = 0.99
-        self.learning_rate = 0.0002
+        self.learning_rate = 0.01
         self.epsilon = 0.02 #Fixed
         self.batch_size = 32 #Fixed
         self.memory_size = 20000
         self.train_start = 1000 #Fixed
-        self.target_update_frequency = 10
+        self.target_update_frequency = 2
         self.hidden_nodes=16;
-        self.hidden_layers=2;
+        self.hidden_layers=1;
 ################################################################################
 ################################################################################
 
